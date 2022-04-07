@@ -1,13 +1,13 @@
-const Empresa = require('../models/empresas.model');
+const Sucursal = require('../models/sucursales.model');
 
-function RegistrarEmpresa(req, res) {
+function RegistrarSucursal(req, res) {
     var parametros = req.body;
-    var cat = new Empresa();
+    var cat = new Sucursal();
 
     if(parametros.nombre ) {
             cat.nombre = parametros.nombre;
-            cat.descripcion = parametros.descripcion;
-            Empresa.find({ nombre : parametros.nombre }, (err, catEncontrado) => {
+            cat.direccion = parametros.direccion;
+            Sucursal.find({ direccion : parametros.direccion }, (err, catEncontrado) => {
                 if ( catEncontrado.length == 0 ) {
 
                     cat.save((err, usuarioGuardado) => {
@@ -16,7 +16,7 @@ function RegistrarEmpresa(req, res) {
                         if(!usuarioGuardado) return res.status(500)
                             .send({ mensaje: 'Error al agregar la empresa'});
                         
-                        return res.status(200).send({ Empresas: usuarioGuardado });
+                        return res.status(200).send({ Sucursales: usuarioGuardado });
                     });                 
                 } else {
                     return res.status(500)
@@ -43,33 +43,34 @@ function EditarEmpresa(req, res) {
 }
 
 
-function EliminarEmpresa(req, res) {
-    var idCat= req.params.idCat;
+function EliminarSucursal(req, res) {
+    var idCat= req.params.idStation;
 
    
-    Empresa.findByIdAndDelete(idCat, (err, catEliminada)=>{
+    Sucursal.findByIdAndDelete(idCat, (err, catEliminada)=>{
         if(err) return res.status(400).send({ mensaje: "Error en la peticion de eliminar la categoria"});
         if(!catEliminada) return res.status(400).send({ mensaje: "Error al eliminar la Empresa"});
 
-        return res.status(200).send({ Empresa_Eliminada: catEliminada})
+        return res.status(200).send({ Sucursal_Eliminada: catEliminada})
     })
    
 }
 
 
-function visualizarEmpresas(req, res) {
+function visualizarSucursal(req, res) {
     
-    Empresa.find({}, (err, catEncontrado) => {
+    Sucursal.find({}, (err, catEncontrado) => {
         if (err) return res.status(500).send({ mensaje: 'Error en la peticion' })
         if (!catEncontrado) return res.status(500).send({ mensaje: 'Error al buscar empresa' })
 
-        return res.status(200).send({ Empresas: catEncontrado })
+        return res.status(200).send({ Sucursales: catEncontrado })
     })
 }
 
 
 module.exports={
-    RegistrarEmpresa,
-    visualizarEmpresas,
-    EliminarEmpresa
+    RegistrarSucursal,
+    EliminarSucursal,
+    visualizarSucursal,
+    EditarEmpresa
     }

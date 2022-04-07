@@ -8,6 +8,7 @@ const api = express.Router();
 
 api.post('/registrar', controladorUsuario.RegistrarAd);
 api.post('/login', controladorUsuario.Login);
+api.post('/registrarUsuario', controladorUsuario.RegistrarUsuario)
 
 
 module.exports = api;
