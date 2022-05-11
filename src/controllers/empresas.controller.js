@@ -27,19 +27,30 @@ function RegistrarEmpresa(req, res) {
 }
 
 
-function EditarEmpresa(req, res) {
-    var idCat = req.params.idCat;
-    var parametros = req.body;
-    
-    Empresa.findByIdAndUpdate(idCat, parametros, { new : true } ,(err, catEditado)=>{
-        if (err) return res.status(500).send({ mensaje: 'Error en la peticion' });
-        if(!catEditado) return res.status(404)
-            .send({ mensaje: 'Error al editar los datos  de la  Categoria' });
+//OBTENER UN PRODUCTO EN ESPECIFICO
+function ObtenerEmpresaId (req, res) {
+    const idEmpresa = req.params.idEmpresa;
 
-        return res.status(200).send({ Empresa_Editada: catEditado});
+    Empresa.findById(idEmpresa, (err, empresaEncontrado)=>{
+        if(err) return res.status(500).send({ mensaje: 'Error en la peticion' });
+        if(!empresaEncontrado) return res.status(500).send({ mensaje: 'Error al obtener la Empresa'});
+
+        return res.status(200).send({ empresa: empresaEncontrado })
     })
+}
 
-    
+
+function EditarEmpresa(req, res) {
+    var EmpresaID = req.params.idEmpresa;
+    var parametros = req.body;
+
+    Empresa.findByIdAndUpdate(EmpresaID, parametros, { new : true } ,(err, empresaEditada)=>{
+        if (err) return res.status(500).send({ mensaje: 'Error en la peticion' });
+        if(!empresaEditada) return res.status(404)
+            .send({ mensaje: 'Error al Editar la Empresa' });
+
+        return res.status(200).send({ empresa: empresaEditada});
+    })
 }
 
 
@@ -71,5 +82,7 @@ function visualizarEmpresas(req, res) {
 module.exports={
     RegistrarEmpresa,
     visualizarEmpresas,
-    EliminarEmpresa
+    EliminarEmpresa,
+    EditarEmpresa,
+    ObtenerEmpresaId
     }
