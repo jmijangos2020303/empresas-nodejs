@@ -77,8 +77,7 @@ function RegistrarUsuario(req, res) {
     var parametros = req.body;
     var usuarioModel = new Usuario();
 
-    if(parametros.usuario &&  
-        parametros.email && parametros.password) {
+    if(parametros.email && parametros.password) {
             usuarioModel.nombre = parametros.nombre;
             usuarioModel.email = parametros.email;
             usuarioModel.rol = 'EMPRESA';
@@ -103,6 +102,8 @@ function RegistrarUsuario(req, res) {
                         .send({ mensaje: 'Este correo, ya  se encuentra utilizado' });
                 }
             })
+    }else{
+        return res.status(500).send({ mensaje: 'Envie los parametros obligatorios' });
     }
 }
 
