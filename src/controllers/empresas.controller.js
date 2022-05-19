@@ -6,7 +6,10 @@ function RegistrarEmpresa(req, res) {
 
     if(parametros.nombre ) {
             cat.nombre = parametros.nombre;
+            cat.direccion = parametros.direccion;
+            cat.telefono = parametros.telefono;
             cat.descripcion = parametros.descripcion;
+            cat.tipoEmpresa = parametros.tipoEmpresa;
             Empresa.find({ nombre : parametros.nombre }, (err, catEncontrado) => {
                 if ( catEncontrado.length == 0 ) {
 
