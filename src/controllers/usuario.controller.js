@@ -1,6 +1,7 @@
 const Usuario = require('../models/usuarios.model');
 const bcrypt = require('bcrypt-nodejs');
 const jwt = require('../services/jwt');
+const Empresa = require('../models/empresas.model')
 
 
 
@@ -109,10 +110,72 @@ function RegistrarUsuario(req, res) {
 
 
 
+/*function Login(req, res) {
+    var parametros = req.body;
+
+    Usuario.findOne({ email : parametros.email }, (err, usuarioEncontrado) => {
+        if(err) return res.status(500).send({ mensaje: 'Error en la peticion'});
+        if (usuarioEncontrado){
+            bcrypt.compare(parametros.password, usuarioEncontrado.password, 
+                (err, verificacionPassword) => {//TRUE OR FALSE
+                    if (verificacionPassword) {
+                        if(parametros.obtenerToken == 'true'){
+                            return res.status(200)
+                                .send({ token: jwt.crearToken(usuarioEncontrado) })
+                        } else {
+                            usuarioEncontrado.password = undefined;
+
+                            return res.status(200)
+                                .send({ usuario: usuarioEncontrado })
+                        }                       
+                    } else {
+                        return res.status(500)
+                            .send({ mensaje: 'La contraseña no coincide.'})
+                    }
+                })
+        } else {
+            Empresa.findOne({email: parametros.email }, (err, empresaEncontrado) => {
+                console.log(empresaEncontrado)
+                if(err) return res.status(500).send({ mensaje: 'Error en la peticion'});
+                if (empresaEncontrado){
+
+
+                    bcrypt.compare(parametros.password, empresaEncontrado.password, 
+                        (err, verificacionPassword) => {//TRUE OR FALSE
+                            if (verificacionPassword) {
+                                if(parametros.obtenerToken == 'true'){
+                                    return res.status(200)
+                                        .send({ token: jwt.crearToken(empresaEncontrado) })
+                                } else {
+                                    empresaEncontrado.password = undefined;
+        
+                                    return res.status(200)
+                                        .send({ empresa: empresaEncontrado })
+                                }                       
+                            } else {
+                                return res.status(500)
+                                    .send({ mensaje: 'La contrasena no coincide.'})
+                            }
+                        })
+
+                } else {
+                    return res.status(500)
+                        .send({ mensaje: 'La Empresa, no se ha podido identificar'})
+                }
+            })
+        }
+    })    
+}*/
+
+
+
+
+
+
 
 module.exports = {
     RegistrarAd,
-    RegistrarUsuario,
     Login,
+    RegistrarUsuario
   
 }

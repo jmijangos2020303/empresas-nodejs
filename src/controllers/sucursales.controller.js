@@ -1,76 +1,214 @@
-const Sucursal = require('../models/sucursales.model');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
+const jwt = require('../services/jwt')
+const res = require('express/lib/response');
+const Sucursales = require('../models/sucursales.model')
 
-function RegistrarSucursal(req, res) {
-    var parametros = req.body;
-    var cat = new Sucursal();
 
-    if(parametros.nombre ) {
-            cat.nombre = parametros.nombre;
-            cat.direccion = parametros.direccion;
-            Sucursal.find({ direccion : parametros.direccion }, (err, catEncontrado) => {
-                if ( catEncontrado.length == 0 ) {
 
-                    cat.save((err, usuarioGuardado) => {
-                        if (err) return res.status(500)
-                            .send({ mensaje: 'Error en la peticion' });
-                        if(!usuarioGuardado) return res.status(500)
-                            .send({ mensaje: 'Error al agregar la empresa'});
-                        
-                        return res.status(200).send({ Sucursales: usuarioGuardado });
-                    });                 
-                } else {
-                    return res.status(500)
-                        .send({ mensaje: 'Esta empresa ya existe en la base de datos ' });
-                }
-            })
-    }
+function agregarSucursal(req, res) {
+    const parametros = req.body;
+    const modeloSucursal = new Sucursales();
+        modeloSucursal.nombre = parametros.nombre;
+        modeloSucursal.telefono = parametros.telefono;
+        modeloSucursal.direccion = parametros.direccion;
+        modeloSucursal.idEmpresa = req.user.sub;
+        modeloSucursal.save((err, sucursalGuardada) => {
+
+            if (err) return res.status(500).send({ mensaje: 'error en la peticion' })
+            if (!sucursalGuardada) return res.status(500).send({ mensaje: 'error al agregar la sucursal' })
+            return res.status(200).send({ sucursal: sucursalGuardada })
+
+        })
 }
 
 
-function EditarEmpresa(req, res) {
-    var idCat = req.params.idCat;
-    var parametros = req.body;
+
+function editarSucursal(req, res) {
+    const parametros = req.body;
     
-    Empresa.findByIdAndUpdate(idCat, parametros, { new : true } ,(err, catEditado)=>{
+    const idEmpresaa = req.user.sub;
+    const idSucursal = req.params.idSucursal;
+
+   
+
+        Sucursales.findOne({ idEmpresa: idEmpresaa }, (err, sucursalEncontrada) => {
+            if (err) return res.status(500).send({ mensaje: 'error en la peticion 1' })
+
+            if (sucursalEncontrada) {
+                Sucursales.findByIdAndUpdate(idSucursal, parametros, { new: true }, (err, sucursalEditada) => {
+                    if (err) return res.status(500).send({ mensaje: 'error en la peticion 2' })
+                    if (!sucursalEditada) return res.status(500).send({ mensaje: 'error al editar la sucursal' })
+                    return res.status(200).send({ sucursal: sucursalEditada })
+                })
+            } else {
+                return res.status(500).send({ mensaje: 'error al encontrar la sucursal' })
+            }
+
+        })
+}
+
+
+
+function eliminarSucursal(req, res) {
+    const idSucursal = req.params.idSucursal;
+    const idEmpresaa = req.user.sub;
+
+    Sucursales.findOne({ idEmpresa: idEmpresaa }, (err, sucursalEncontrada) => {
+        if (sucursalEncontrada) {
+            if(sucursalEncontrada.idEmpresa==idEmpresaa){
+                Sucursales.findByIdAndDelete({ _id: idSucursal }, (err, sucursalEliminada) => {
+                    if (err) return res.status(500).send({ mensaje: 'Hubo un error en la peticion' })
+                    if (!sucursalEliminada) return res.status(500).send({ mensaje: 'error al editar sucursal' })
+                    return res.status(200).send({ sucursal: sucursalEliminada })
+                })
+            }else{
+                return res.status(500).send({ mensaje: 'No puede eliminar sucurasles de otras empresas' })
+            }
+        } else {
+            return res.status(500).send({ mensaje: 'error al encontrar las sucursal'})
+        }
+    })
+}
+
+
+
+function obtenerSucursales(req, res) {
+    const idEmpresaa = req.user.sub;
+    Sucursales.find({ idEmpresa: idEmpresaa }, (err, sucursalesEncontradas) => {
+        if (err) return res.status(500).send({ mensaje: 'error en la peticion 1' })
+        if (!sucursalesEncontradas) return res.status(500).send({ mensaje: 'error al encontrar las sucursales' })
+        return res.status(200).send({ sucursales: sucursalesEncontradas })
+    })
+}
+
+
+function obtenerProductos(req, res) {
+    const idSucursal = req.params.idSucursal;
+    Sucursales.aggregate([
+        {
+            $match: { "_id": mongoose.Types.ObjectId(idSucursal) }
+        },
+        {
+            $unwind: "$productos"
+        },
+        {
+            $match: {}
+        },
+        {
+            $group: {
+                "_id": "$_id",
+                "nombre": { "$first": "$nombre" },
+                "productos": { $push: "$productos" }
+            }
+        }
+    ]).exec((err, productosEncontrados) => {
+        if(productosEncontrados[0] == null){
+            return res.status(500).send({ mensaje: 'No se encontro'})
+
+        }else{
+            return res.status(200).send({ productos: productosEncontrados[0].productos})
+
+        }
+    })
+}
+
+
+
+function ObtenerSucursalxId(req, res) {
+    const idSucursal = req.params.idSucursal;
+
+    Sucursales.findById(idSucursal, (err, sucursalEncontrada) => {
         if (err) return res.status(500).send({ mensaje: 'Error en la peticion' });
-        if(!catEditado) return res.status(404)
-            .send({ mensaje: 'Error al editar los datos  de la  Categoria' });
+        if (!sucursalEncontrada) return res.status(500).send({ mensaje: 'Error al obtener el Producto' });
 
-        return res.status(200).send({ Empresa_Editada: catEditado});
-    })
-
-    
-}
-
-
-function EliminarSucursal(req, res) {
-    var idCat= req.params.idStation;
-
-   
-    Sucursal.findByIdAndDelete(idCat, (err, catEliminada)=>{
-        if(err) return res.status(400).send({ mensaje: "Error en la peticion de eliminar la categoria"});
-        if(!catEliminada) return res.status(400).send({ mensaje: "Error al eliminar la Empresa"});
-
-        return res.status(200).send({ Sucursal_Eliminada: catEliminada})
-    })
-   
-}
-
-
-function visualizarSucursal(req, res) {
-    
-    Sucursal.find({}, (err, catEncontrado) => {
-        if (err) return res.status(500).send({ mensaje: 'Error en la peticion' })
-        if (!catEncontrado) return res.status(500).send({ mensaje: 'Error al buscar empresa' })
-
-        return res.status(200).send({ Sucursales: catEncontrado })
+        return res.status(200).send({ sucursal: sucursalEncontrada })
     })
 }
 
 
-module.exports={
-    RegistrarSucursal,
-    EliminarSucursal,
-    visualizarSucursal,
-    EditarEmpresa
-    }
+
+
+function generarVenta(req, res) {
+    const idProducto = req.params.idProducto
+    const idEmpresa = req.user.sub;
+    const parametros = req.body;
+
+
+    const idSucursal = req.params.idSucursal;
+    Sucursales.aggregate([
+        {
+            $match: { "_id": mongoose.Types.ObjectId(idSucursal) }
+        },
+        {
+            $unwind: "$productos"
+        },
+        {
+            $match: { "productos._id": mongoose.Types.ObjectId(idProducto) }
+        },
+        {
+            $group: {
+                "_id": "$_id",
+                "nombre": { "$first": "$nombre" },
+                "productos": { $push: "$productos" }
+            }
+        }
+    ]).exec((err, productosEncontrados) => {
+
+        if (productosEncontrados[0].productos[0].stock < parametros.stock) {
+            return res.status(500).send({mensaje: 'No hay suficiente stock'})
+        } else {
+            Sucursales.updateOne({ "productos._id": idProducto }, { $inc: { "productos.$.stock": -parametros.stock } }, { new: true }, (err, productosActualizados) => {
+
+                if (err) return res.status(500).send({ mensaje: 'error en la peticion' })
+                if (!productosActualizados) return res.status(500).send({ mensaje: 'error al editar el producto' })
+
+                return res.status(200).send({ producto: productosActualizados })
+
+            })
+        }
+    })
+}
+
+
+
+
+function obtenerProductoId(req, res){
+    const idProducto = req.params.idProducto
+    const idSucursal = req.params.idSucursal;
+    Sucursales.aggregate([
+        {
+            $match: { "_id": mongoose.Types.ObjectId(idSucursal) }
+        },
+        {
+            $unwind: "$productos"
+        },
+        {
+            $match: { "productos._id": mongoose.Types.ObjectId(idProducto) }
+        },
+        {
+            $group: {
+                "_id": "$_id",
+                "nombre": { "$first": "$nombre" },
+                "productos": { $push: "$productos" }
+            }
+        }
+    ]).exec((err, productosEncontrados) => {
+
+        return res.status(200).send({productos: productosEncontrados[0].productos[0]})
+
+    })
+}
+
+
+
+module.exports = {
+    obtenerProductoId,
+    obtenerSucursales,
+    eliminarSucursal,
+    editarSucursal,
+    agregarSucursal,
+    obtenerProductos,
+    ObtenerSucursalxId,
+    generarVenta
+}

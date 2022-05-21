@@ -6,8 +6,16 @@ const EmpresaSchema = Schema({
     direccion:String,
     telefono: Number,
     descripcion:String,
-    tipoEmpresa:String
-    //id_usuario: { type: Schema.Types.ObjectId, ref: 'Usuarios'},
+    rol: String,
+    tipoEmpresa:String,
+    productos:[
+        {
+            nombreProducto: String,
+            precioProducto: Number,
+            stock: Number
+    }
+],
+creador: {type:Schema.Types.String, ref: 'Usuarios'}
 });
 
 module.exports = mongoose.model('Empresas',EmpresaSchema);
