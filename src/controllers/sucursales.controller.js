@@ -10,7 +10,7 @@ function agregarSucursal(req, res) {
     const parametros = req.body;
     const modeloSucursal = new Sucursales();
         modeloSucursal.nombre = parametros.nombre;
-        modeloSucursal.telefono = parametros.telefono;
+        modeloSucursal.municipio = parametros.municipio;
         modeloSucursal.direccion = parametros.direccion;
         modeloSucursal.idEmpresa = req.user.sub;
         modeloSucursal.save((err, sucursalGuardada) => {

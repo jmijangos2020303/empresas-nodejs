@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const SucursalesSchema = Schema({
     nombre: String,
-    telefono: String,
+    municipio: String,
     direccion: String,
     productos: [
       {
