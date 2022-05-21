@@ -11,6 +11,12 @@ api.delete('/eliminarEmpresa/:idCat', md_autenticacion.Auth, controladorEmpresa.
 api.get('/obtenerEmpresa/:idEmpresa', md_autenticacion.Auth, controladorEmpresa.ObtenerEmpresaId);
 api.get('/verEmpresas', md_autenticacion.Auth,controladorEmpresa.visualizarEmpresas);
 api.get('/verEmpresa', md_autenticacion.Auth,controladorEmpresa.obtenerEmpresas);
+api.put('/agregarProductosEmpresa', md_autenticacion.Auth, controladorEmpresa.agregarProductos);
+api.put('/editarProductosEmpresa/:idProducto', md_autenticacion.Auth, controladorEmpresa.editarProductos);
+api.get('/obtenerProductosEmpresa', md_autenticacion.Auth, controladorEmpresa.obtenerProductos);
+api.delete('/eliminarProductosEmpresa/:idProducto', md_autenticacion.Auth, controladorEmpresa.eliminarProductos);
+api.get('/obtenerProductoEmpresa/:idProducto', md_autenticacion.Auth, controladorEmpresa.obtenerProducto);
+api.put('/agregarProductosSucursal/:idSucursal/:idProducto', md_autenticacion.Auth, controladorEmpresa.agregarProductosSucursal);
 
 
 
