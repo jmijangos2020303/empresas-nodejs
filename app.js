@@ -4,7 +4,6 @@ var app = express();
 
 // IMPORTACIONES RUTAS
 const UsuarioRutas = require('./src/routes/usuario.routes');
-const CatRutas = require('./src/routes/empresas.routes');
 const SucursalesRutas = require('./src/routes/sucursales.routes');
 
 // MIDDLEWARES -> INTERMEDIARIOS
@@ -16,7 +15,7 @@ app.use(cors());
 
 
 // CARGA DE RUTAS localhost:3000/api/obtenerProductos
-app.use('/api', UsuarioRutas,CatRutas,SucursalesRutas);
+app.use('/api', UsuarioRutas, SucursalesRutas);
 
 
 module.exports = app;

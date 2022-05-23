@@ -2,17 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const SucursalesSchema = Schema({
-    nombre: String,
-    municipio: String,
-    direccion: String,
-    productos: [
-      {
-        nombreProducto: String,
-        precioProducto: Number,
-        stock: Number
-      }
-    ],
-    idEmpresa: { type: Schema.Types.ObjectId, ref: "Empresas" },
-  });
+  nombre: String,
+  telefono: String,
+  direccion: String,
+  idEmpresa: { type: Schema.Types.ObjectId, ref: "Usuarios" },
+});
   
   module.exports = mongoose.model("Sucursales", SucursalesSchema);
